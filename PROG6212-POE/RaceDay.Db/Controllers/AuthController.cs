@@ -20,7 +20,7 @@ namespace RaceDay.DB.Controllers
             _context = context;
         }
 
-        
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
