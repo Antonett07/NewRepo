@@ -4,5 +4,6 @@
     <File Path="ci.yml" />
   </Folder>
   <Project Path="../RaceDay.Test/RaceDay.Test.csproj" />
+  <Project Path="../RaceDay.Web/RaceDay.Web.csproj" Id="c09495c1-4fc8-4875-9c28-faca0c7dbe09" />
   <Project Path="RaceDay.DB.csproj" />
 </Solution>

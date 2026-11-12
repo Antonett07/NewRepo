@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RaceDay.DB.Data;
+using RaceDay.DB.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 // Entity Framework SQLite connection
 builder.Services.AddDbContext<RaceDayDbContext>(options =>
