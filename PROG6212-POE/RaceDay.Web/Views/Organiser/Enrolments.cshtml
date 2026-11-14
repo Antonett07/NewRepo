@@ -1,0 +1,153 @@
+﻿@model List<RaceDay.Web.ViewModels.EnrolmentViewModel>
+@{
+    var ev = ViewBag.Event as RaceDay.Web.ViewModels.EventViewModel;
+    ViewData["Title"] = "Enrolments - " + (ev?.EventName ?? "Event");
+    int confirmedCount = Model.Count(e => e.IsConfirmed);
+    int pendingCount = Model.Count(e => e.IsPending);
+}
+
+<div class="mb-4">
+    <a asp-action="Events" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Events Management
+    </a>
+</div>
+
+<div class="card rd-card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white p-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <span class="badge bg-warning text-dark text-uppercase fw-bold mb-1">Enrolments Roster</span>
+                <h3 class="fw-bold text-white mb-0">@ev?.EventName</h3>
+                <small class="text-white-50"><i class="bi bi-calendar3 me-1"></i> @ev?.FormattedDate &nbsp;|&nbsp; <i class="bi bi-geo-alt me-1"></i> @ev?.Location</small>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-action="ResultsEntry" asp-route-eventId="@ev?.EventId" class="btn btn-success btn-sm">
+                    <i class="bi bi-trophy-fill me-1"></i> Enter / Publish Results
+                </a>
+                <a asp-action="Categories" asp-route-eventId="@ev?.EventId" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-tags me-1"></i> Categories
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        @* Summary Pills *@
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">Total Participants</small>
+                        <h4 class="fw-bold mb-0 text-dark">@Model.Count</h4>
+                    </div>
+                    <i class="bi bi-people fs-2 text-primary"></i>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">Confirmed / Paid</small>
+                        <h4 class="fw-bold mb-0 text-success">@confirmedCount</h4>
+                    </div>
+                    <i class="bi bi-check-circle-fill fs-2 text-success"></i>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">Pending Review</small>
+                        <h4 class="fw-bold mb-0 text-warning">@pendingCount</h4>
+                    </div>
+                    <i class="bi bi-clock-history fs-2 text-warning"></i>
+                </div>
+            </div>
+        </div>
+
+        @* Enrolments Table *@
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 100px;">Race #</th>
+                        <th>Participant</th>
+                        <th>Contact</th>
+                        <th>Selected Category</th>
+                        <th>Enrolment Date</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var entry in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @if (entry.RaceNumber.HasValue)
+                                    {
+                                        <span class="badge bg-dark fs-6 px-2 py-1 font-monospace">
+                                            #@entry.RaceNumber.Value
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Unassigned</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">@entry.ParticipantName</div>
+                                    <small class="text-muted">ID: @entry.ParticipantId</small>
+                                </td>
+                                <td class="small">
+                                    <div><i class="bi bi-envelope me-1 text-muted"></i>@entry.ParticipantEmail</div>
+                                    @if (!string.IsNullOrEmpty(entry.ParticipantPhone))
+                                    {
+                                        <div><i class="bi bi-telephone me-1 text-muted"></i>@entry.ParticipantPhone</div>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">@entry.CategoryName</div>
+                                    <span class="badge bg-primary">@entry.DistanceKM km</span>
+                                </td>
+                                <td class="small text-muted">
+                                    @entry.EnrolmentDate.ToString("dd MMM yyyy HH:mm")
+                                </td>
+                                <td class="text-center">
+                                    @* Visually distinct color-coded statuses (Requirement 7) *@
+                                    @if (entry.IsConfirmed)
+                                    {
+                                        <span class="status-badge status-confirmed">
+                                            <i class="bi bi-check-circle-fill"></i> Confirmed
+                                        </span>
+                                    }
+                                    else if (entry.IsPending)
+                                    {
+                                        <span class="status-badge status-pending">
+                                            <i class="bi bi-clock-fill"></i> Pending
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-cancelled">
+                                            <i class="bi bi-x-circle-fill"></i> @entry.PaymentStatus
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-person-x fs-1 d-block mb-2"></i>
+                                <h5>No participants enrolled yet</h5>
+                                <p class="small">Participants will appear here once they register for this race.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

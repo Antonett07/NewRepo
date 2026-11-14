@@ -1,0 +1,113 @@
+﻿@model List<RaceDay.Web.ViewModels.EventViewModel>
+@{
+    ViewData["Title"] = "Events Management";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-kanban text-warning me-2"></i>Events Management
+        </h2>
+        <p class="text-muted mb-0">Create, edit, manage categories, enrolments, and results for your races</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Dashboard" class="btn btn-outline-secondary">
+            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+        </a>
+        <a asp-action="CreateEvent" class="btn btn-raceday">
+            <i class="bi bi-plus-circle-fill me-1"></i> Add New Event
+        </a>
+    </div>
+</div>
+
+<div class="card rd-card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 90px;">Banner</th>
+                    <th>Event Details</th>
+                    <th>Event Date</th>
+                    <th>Location</th>
+                    <th>Sport Type</th>
+                    <th>Distance</th>
+                    <th class="text-center">Enrolments</th>
+                    <th class="text-end" style="min-width: 220px;">Management</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var ev in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(ev.BannerImageUrl))
+                                {
+                                    <img src="@ev.BannerImageUrl" alt="@ev.EventName" class="rounded" style="width: 75px; height: 50px; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <div class="bg-light border rounded d-flex align-items-center justify-content-center text-muted" style="width: 75px; height: 50px;">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">@ev.EventName</div>
+                                <small class="text-muted text-truncate d-inline-block" style="max-width: 220px;">@ev.Description</small>
+                            </td>
+                            <td>
+                                <div class="small fw-bold">@ev.ShortDate</div>
+                                <span class="badge @(ev.IsUpcoming ? "bg-success" : "bg-secondary") small">
+                                    @(ev.IsUpcoming ? "Upcoming" : "Concluded")
+                                </span>
+                            </td>
+                            <td class="small text-muted"><i class="bi bi-geo-alt me-1 text-danger"></i>@ev.Location</td>
+                            <td><span class="badge bg-dark">@ev.EventType</span></td>
+                            <td class="small fw-semibold">@(ev.Distance ?? "Multiple")</td>
+                            <td class="text-center">
+                                <a asp-action="Enrolments" asp-route-eventId="@ev.EventId" class="badge bg-primary text-decoration-none p-2 fs-6">
+                                    @ev.TotalEnrolments
+                                </a>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                    <a asp-action="Categories" asp-route-eventId="@ev.EventId" class="btn btn-sm btn-outline-primary" title="Manage Categories">
+                                        <i class="bi bi-tags"></i> Categories
+                                    </a>
+                                    <a asp-action="Enrolments" asp-route-eventId="@ev.EventId" class="btn btn-sm btn-outline-info" title="View Enrolments">
+                                        <i class="bi bi-people"></i> Enrolments
+                                    </a>
+                                    <a asp-action="ResultsEntry" asp-route-eventId="@ev.EventId" class="btn btn-sm btn-outline-success" title="Enter Results">
+                                        <i class="bi bi-trophy"></i> Results
+                                    </a>
+                                    <a asp-action="EditEvent" asp-route-id="@ev.EventId" class="btn btn-sm btn-outline-warning" title="Edit Event">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="DeleteEvent" asp-route-id="@ev.EventId" method="post" class="d-inline"
+                                          onsubmit="return confirm('Are you sure you want to delete @ev.EventName? All associated categories and enrolments will be removed.');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Event">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                            <h5>No events found</h5>
+                            <p class="small">Click "Add New Event" to create your first sporting event.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

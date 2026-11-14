@@ -1,0 +1,119 @@
+﻿@model RaceDay.Web.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Create an Account";
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="card rd-card shadow">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex p-3 rounded-circle bg-warning bg-opacity-10 text-warning mb-2">
+                        <i class="bi bi-person-plus-fill fs-2"></i>
+                    </div>
+                    <h2 class="fw-bold mb-1">Join RaceDay</h2>
+                    <p class="text-muted small">Choose your role and get started in seconds</p>
+                </div>
+
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty]?.Errors.Count > 0)
+                {
+                    <div class="alert alert-danger py-2 px-3 small">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        @Html.ValidationSummary(true, "")
+                    </div>
+                }
+
+                <form asp-controller="Account" asp-action="Register" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Select Account Type</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" name="RoleID" id="roleParticipant" value="2" checked="@(Model.RoleID == 2)" />
+                                <label class="btn btn-outline-primary w-100 p-3 text-start h-100" for="roleParticipant">
+                                    <div class="fw-bold"><i class="bi bi-person-walking me-1"></i> Participant</div>
+                                    <small class="text-muted d-block">Enrol in races &amp; track my results</small>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" name="RoleID" id="roleOrganiser" value="1" checked="@(Model.RoleID == 1)" />
+                                <label class="btn btn-outline-warning w-100 p-3 text-start h-100" for="roleOrganiser">
+                                    <div class="fw-bold text-dark"><i class="bi bi-flag-fill me-1 text-warning"></i> Organiser</div>
+                                    <small class="text-muted d-block">Create events, upload banners &amp; publish</small>
+                                </label>
+                            </div>
+                        </div>
+                        <span asp-validation-for="RoleID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="FirstName" class="form-label fw-semibold"></label>
+                            <input asp-for="FirstName" class="form-control" placeholder="e.g. Thabo" />
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="LastName" class="form-label fw-semibold"></label>
+                            <input asp-for="LastName" class="form-control" placeholder="e.g. Mokoena" />
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-semibold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" class="form-control" placeholder="name@example.co.za" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PhoneNumber" class="form-label fw-semibold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-telephone"></i></span>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="082 123 4567" />
+                        </div>
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="Password" class="form-label fw-semibold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                                <input asp-for="Password" class="form-control" placeholder="At least 6 characters" />
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ConfirmPassword" class="form-label fw-semibold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-lock-fill"></i></span>
+                                <input asp-for="ConfirmPassword" class="form-control" placeholder="Repeat password" />
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-raceday w-100 py-2 mb-3">
+                        <i class="bi bi-check-circle-fill me-1"></i> Complete Registration
+                    </button>
+
+                    <div class="text-center">
+                        <span class="text-muted small">Already registered?</span>
+                        <a asp-controller="Account" asp-action="Login" class="fw-semibold text-decoration-none ms-1">
+                            Sign In
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+dotnet add .\PROG6212-POE\RaceDay.Web\RaceDay.Web.csproj package Azure.Storage.Blobs --version 12.30.1

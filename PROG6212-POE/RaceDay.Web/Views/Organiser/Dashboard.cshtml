@@ -1,0 +1,155 @@
+﻿@model RaceDay.Web.ViewModels.OrganiserDashboardViewModel
+@{
+    ViewData["Title"] = "Organiser Dashboard";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-speedometer2 text-warning me-2"></i>Organiser Dashboard
+        </h2>
+        <p class="text-muted mb-0">Overview of your events, enrolments, and race management</p>
+    </div>
+    <a asp-action="CreateEvent" class="btn btn-raceday">
+        <i class="bi bi-plus-circle-fill me-1"></i> Create New Event
+    </a>
+</div>
+
+@* Summary Metric Cards *@
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="rd-stat-box">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small text-uppercase fw-bold">Total Events</span>
+                    <h3 class="fw-bold mb-0 text-dark">@Model.TotalEvents</h3>
+                </div>
+                <div class="p-3 rounded-circle bg-warning bg-opacity-10 text-warning fs-3">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="rd-stat-box" style="border-left-color: #10b981;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small text-uppercase fw-bold">Total Enrolments</span>
+                    <h3 class="fw-bold mb-0 text-success">@Model.TotalEnrolments</h3>
+                </div>
+                <div class="p-3 rounded-circle bg-success bg-opacity-10 text-success fs-3">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="rd-stat-box" style="border-left-color: #0ea5e9;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small text-uppercase fw-bold">Upcoming Dates</span>
+                    <h3 class="fw-bold mb-0 text-primary">@Model.UpcomingEventsCount</h3>
+                </div>
+                <div class="p-3 rounded-circle bg-primary bg-opacity-10 text-primary fs-3">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="rd-stat-box" style="border-left-color: #64748b;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small text-uppercase fw-bold">Concluded Races</span>
+                    <h3 class="fw-bold mb-0 text-secondary">@Model.CompletedEventsCount</h3>
+                </div>
+                <div class="p-3 rounded-circle bg-secondary bg-opacity-10 text-secondary fs-3">
+                    <i class="bi bi-flag-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Summary Table of All Events Created *@
+<div class="card rd-card shadow-sm mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0"><i class="bi bi-list-stars me-2 text-warning"></i>Your Managed Events Summary</h5>
+        <a asp-action="Events" class="btn btn-outline-secondary btn-sm">Full Events Management</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 80px;">Banner</th>
+                    <th>Event Name</th>
+                    <th>Date &amp; Time</th>
+                    <th>Location</th>
+                    <th>Sport / Type</th>
+                    <th class="text-center">Enrolments</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Events.Any())
+                {
+                    @foreach (var ev in Model.Events)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(ev.BannerImageUrl))
+                                {
+                                    <img src="@ev.BannerImageUrl" alt="@ev.EventName" class="rounded" style="width: 60px; height: 40px; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <div class="bg-light border rounded d-flex align-items-center justify-content-center text-muted" style="width: 60px; height: 40px;">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">@ev.EventName</div>
+                                <small class="text-muted">Distance: @(ev.Distance ?? "Multiple")</small>
+                            </td>
+                            <td>
+                                <div class="small fw-semibold">@ev.ShortDate</div>
+                                <small class="text-muted">@(ev.IsUpcoming ? "Upcoming" : "Concluded")</small>
+                            </td>
+                            <td class="small text-muted">@ev.Location</td>
+                            <td><span class="badge bg-dark">@ev.EventType</span></td>
+                            <td class="text-center">
+                                <span class="badge bg-primary fs-6 px-3 py-1">@ev.TotalEnrolments</span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Categories" asp-route-eventId="@ev.EventId" class="btn btn-outline-secondary" title="Manage Categories">
+                                        <i class="bi bi-tags"></i>
+                                    </a>
+                                    <a asp-action="Enrolments" asp-route-eventId="@ev.EventId" class="btn btn-outline-info" title="View Enrolled Participants">
+                                        <i class="bi bi-people"></i>
+                                    </a>
+                                    <a asp-action="ResultsEntry" asp-route-eventId="@ev.EventId" class="btn btn-outline-success" title="Capture / Publish Results">
+                                        <i class="bi bi-trophy"></i>
+                                    </a>
+                                    <a asp-action="EditEvent" asp-route-id="@ev.EventId" class="btn btn-outline-warning" title="Edit Event">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            You have not created any events yet. Click <strong>Create New Event</strong> above to start!
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

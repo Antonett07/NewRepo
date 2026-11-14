@@ -1,0 +1,1 @@
+﻿{\n  "Logging": {\n    "LogLevel": {\n      "Default": "Information",\n      "Microsoft.AspNetCore": "Warning"\n    }\n  },\n  "ApiBaseUrl": "http://localhost:5000/",\n  "AllowedHosts": "*",\n  "ApiSettings": {\n    "BaseUrl": "http://localhost:5000/"\n  }\n}

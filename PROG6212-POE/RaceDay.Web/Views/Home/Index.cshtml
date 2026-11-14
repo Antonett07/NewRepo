@@ -1,0 +1,50 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Upcoming Events - RaceDay SA";
+}
+
+<div class="container my-5">
+    <!-- Hero Section -->
+    <div class="p-5 mb-4 bg-dark text-white rounded-3 border border-warning shadow">
+        <div class="container-fluid py-3">
+            <h1 class="display-5 fw-bold text-warning">🏁 Welcome to RaceDay SA</h1>
+            <p class="col-md-8 fs-4">Browse upcoming road running, walking, and cycling events across South Africa, enter categories, and track your performance history.</p>
+            <a class="btn btn-warning btn-lg fw-bold text-dark mt-2" asp-controller="Account" asp-action="Register">Get Started</a>
+        </div>
+    </div>
+
+    <!-- Events Listing Grid -->
+    <h2 class="mb-4 text-dark fw-bold">Upcoming Events</h2>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var ev in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-dark">@ev.Name</h5>
+                            <p class="card-text text-muted">@ev.Description</p>
+                            <ul class="list-unstyled small mb-3">
+                                <li><strong> Date:</strong> @ev.Date</li>
+                                <li><strong> Location:</strong> @ev.Location</li>
+                                <li><strong> Distance:</strong> @ev.Distance</li>
+                            </ul>
+                            <a href="#" class="btn btn-dark btn-sm w-100">View Details & Enter</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-secondary text-center py-4" role="alert">
+                    <p class="mb-1">No upcoming events found or unable to reach the API.</p>
+                    <small class="text-muted">Ensure your `RaceDay.DB` API is running and configured correctly.</small>
+                </div>
+            </div>
+        }
+    </div>
+</div>

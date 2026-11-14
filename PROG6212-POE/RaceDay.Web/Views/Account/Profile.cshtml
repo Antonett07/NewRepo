@@ -1,0 +1,106 @@
+﻿@model RaceDay.Web.ViewModels.UserProfileViewModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="row justify-content-center my-4">
+    <div class="col-md-8 col-lg-7">
+        <div class="card rd-card shadow">
+            <div class="card-header bg-dark text-white p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="fw-bold mb-1"><i class="bi bi-person-badge me-2 text-warning"></i> User Profile</h4>
+                        <small class="text-white-50">Manage your personal information and profile picture</small>
+                    </div>
+                    <span class="badge @(Model.Role == "Organiser" ? "badge-role-organiser" : "badge-role-participant")">
+                        @Model.Role
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <form asp-controller="Account" asp-action="Profile" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="UserId" />
+                    <input type="hidden" asp-for="Role" />
+                    <input type="hidden" asp-for="ProfilePictureUrl" />
+
+                    @* Profile Picture Header & Upload *@
+                    <div class="d-flex flex-column flex-sm-row align-items-center gap-4 mb-4 pb-4 border-bottom">
+                        @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+                        {
+                            <img src="@Model.ProfilePictureUrl" alt="@Model.FirstName" class="rd-avatar-lg" />
+                        }
+                        else
+                        {
+                            <div class="rd-avatar-lg bg-light d-flex align-items-center justify-content-center text-muted border">
+                                <i class="bi bi-person fs-1"></i>
+                            </div>
+                        }
+
+                        <div class="flex-grow-1 w-100">
+                            <label asp-for="NewProfilePicture" class="form-label fw-semibold">
+                                <i class="bi bi-camera-fill text-warning me-1"></i> Upload Profile Picture
+                            </label>
+                            <input asp-for="NewProfilePicture" type="file" class="form-control" accept="image/*" />
+                            <small class="text-muted d-block mt-1">
+                                Image is uploaded securely to Azure Blob Storage via the REST API.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="FirstName" class="form-label fw-semibold"></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="LastName" class="form-label fw-semibold"></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-semibold"></label>
+                        <input asp-for="Email" class="form-control bg-light" readonly />
+                        <small class="text-muted">Email is linked to your account and cannot be modified.</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="PhoneNumber" class="form-label fw-semibold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-telephone"></i></span>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="082 123 4567" />
+                        </div>
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-2">
+                        @if (Model.Role == "Organiser")
+                        {
+                            <a asp-controller="Organiser" asp-action="Dashboard" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> Dashboard
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Participant" asp-action="MyEnrolments" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> My Enrolments
+                            </a>
+                        }
+
+                        <button type="submit" class="btn btn-raceday px-4">
+                            <i class="bi bi-save-fill me-1"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

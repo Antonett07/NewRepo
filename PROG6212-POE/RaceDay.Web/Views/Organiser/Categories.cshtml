@@ -1,0 +1,132 @@
+﻿@model RaceDay.Web.ViewModels.CreateCategoryViewModel
+@{
+    var ev = ViewBag.Event as RaceDay.Web.ViewModels.EventViewModel;
+    var categories = ViewBag.Categories as List<RaceDay.Web.ViewModels.CategoryViewModel> ?? new();
+    ViewData["Title"] = "Manage Categories - " + (ev?.EventName ?? "Event");
+}
+
+<div class="mb-4">
+    <a asp-action="Events" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Events Management
+    </a>
+</div>
+
+<div class="card rd-card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white p-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <span class="badge bg-warning text-dark text-uppercase fw-bold mb-1">Categories Management</span>
+                <h3 class="fw-bold text-white mb-0">@ev?.EventName</h3>
+                <small class="text-white-50"><i class="bi bi-calendar3 me-1"></i> @ev?.FormattedDate &nbsp;|&nbsp; <i class="bi bi-geo-alt me-1"></i> @ev?.Location</small>
+            </div>
+            <a asp-action="Enrolments" asp-route-eventId="@ev?.EventId" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-people me-1"></i> View Enrolments
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        @* Add Category Form *@
+        <div class="card bg-light border-0 p-4 mb-4 rounded-3">
+            <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle-fill text-warning me-2"></i>Add Age or Distance Category</h5>
+            
+            <form asp-action="AddCategory" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="EventId" />
+                <input type="hidden" asp-for="EventName" />
+
+                <div class="col-md-4">
+                    <label asp-for="CategoryName" class="form-label fw-semibold"></label>
+                    <input asp-for="CategoryName" class="form-control" placeholder="e.g. 42.2km Full Marathon" />
+                    <span asp-validation-for="CategoryName" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="DistanceKM" class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <input asp-for="DistanceKM" class="form-control" type="number" step="0.1" placeholder="42.2" />
+                        <span class="input-group-text bg-white">km</span>
+                    </div>
+                    <span asp-validation-for="DistanceKM" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="EntryFee" class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">R</span>
+                        <input asp-for="EntryFee" class="form-control" type="number" step="0.01" placeholder="350.00" />
+                    </div>
+                    <span asp-validation-for="EntryFee" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="MaxParticipants" class="form-label fw-semibold"></label>
+                    <input asp-for="MaxParticipants" class="form-control" type="number" placeholder="5000" />
+                    <span asp-validation-for="MaxParticipants" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-raceday">
+                        <i class="bi bi-plus-lg me-1"></i> Add Category
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        @* Existing Categories Table *@
+        <h5 class="fw-bold mb-3"><i class="bi bi-list-check text-warning me-2"></i>Configured Categories (@categories.Count)</h5>
+        
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Category Name</th>
+                        <th>Distance</th>
+                        <th>Entry Fee</th>
+                        <th>Capacity</th>
+                        <th>Current Enrolments</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (categories.Any())
+                    {
+                        @foreach (var c in categories)
+                        {
+                            <tr>
+                                <td class="fw-bold">@c.CategoryName</td>
+                                <td><span class="badge bg-primary">@c.DistanceKM km</span></td>
+                                <td class="fw-semibold">R @c.EntryFee.ToString("N2")</td>
+                                <td>@c.MaxParticipants runners</td>
+                                <td>
+                                    <span class="badge bg-dark">@c.EnrolmentsCount enrolled</span>
+                                </td>
+                                <td class="text-end">
+                                    <form asp-action="DeleteCategory" asp-route-id="@c.CategoryId" asp-route-eventId="@ev?.EventId" method="post" class="d-inline"
+                                          onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Category">
+                                            <i class="bi bi-trash"></i> Remove
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                No categories added yet. Add your first distance or age category using the form above.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

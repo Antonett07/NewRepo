@@ -1,0 +1,125 @@
+﻿@model RaceDay.Web.ViewModels.EventResultsEntryViewModel
+@{
+    ViewData["Title"] = "Capture & Publish Results - " + Model.EventName;
+}
+
+<div class="mb-4">
+    <a asp-action="Events" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Events Management
+    </a>
+</div>
+
+<div class="card rd-card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white p-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <span class="badge bg-warning text-dark text-uppercase fw-bold mb-1">Official Timing &amp; Results Entry</span>
+                <h3 class="fw-bold text-white mb-0">@Model.EventName</h3>
+                <small class="text-white-50"><i class="bi bi-calendar3 me-1"></i> @Model.EventDate.ToString("dd MMMM yyyy") &nbsp;|&nbsp; <i class="bi bi-geo-alt me-1"></i> @Model.Location</small>
+            </div>
+            <a asp-action="Enrolments" asp-route-eventId="@Model.EventId" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-people me-1"></i> View Enrolments
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        <div class="alert alert-info d-flex align-items-center gap-2 mb-4">
+            <i class="bi bi-info-circle-fill fs-5"></i>
+            <div>
+                Capture and publish individual finishing times and positions for participants.
+                Once published, results will immediately appear on the participant's <strong>My Results</strong> race history page.
+            </div>
+        </div>
+
+        @if (Model.Participants.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Race #</th>
+                            <th>Participant</th>
+                            <th>Category</th>
+                            <th style="min-width: 140px;">Finish Time (hh:mm:ss)</th>
+                            <th style="min-width: 110px;">Overall Pos</th>
+                            <th style="min-width: 110px;">Cat Pos</th>
+                            <th style="min-width: 130px;">Status</th>
+                            <th class="text-end" style="min-width: 130px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.Participants)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge bg-dark font-monospace">
+                                        @(p.RaceNumber.HasValue ? $"#{p.RaceNumber.Value}" : "-")
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">@p.ParticipantName</div>
+                                    @if (p.ExistingResultId.HasValue)
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle small">
+                                            <i class="bi bi-check2-circle"></i> Published
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">@p.CategoryName</span>
+                                </td>
+                                
+                                @* Capture / Edit Form for this Participant *@
+                                <td colspan="5" class="p-0">
+                                    <form asp-action="PublishResult" asp-route-eventId="@Model.EventId" method="post" class="d-flex align-items-center p-2 gap-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="EnrolmentId" value="@p.EnrolmentId" />
+
+                                        <div style="min-width: 130px;">
+                                            <input type="text" name="FinishTimeString" value="@p.FinishTime"
+                                                   class="form-control form-control-sm font-monospace text-center" placeholder="02:14:35" required />
+                                        </div>
+
+                                        <div style="min-width: 100px;">
+                                            <input type="number" name="OverallPosition" value="@p.OverallPosition"
+                                                   class="form-control form-control-sm text-center" placeholder="47" required />
+                                        </div>
+
+                                        <div style="min-width: 100px;">
+                                            <input type="number" name="CategoryPosition" value="@p.CategoryPosition"
+                                                   class="form-control form-control-sm text-center" placeholder="12" />
+                                        </div>
+
+                                        <div style="min-width: 120px;">
+                                            <select name="Status" class="form-select form-select-sm">
+                                                <option value="Finished" selected="@(p.Status == "Finished")">Finished</option>
+                                                <option value="DNF" selected="@(p.Status == "DNF")">DNF (Did Not Finish)</option>
+                                                <option value="DNS" selected="@(p.Status == "DNS")">DNS (Did Not Start)</option>
+                                                <option value="DQ" selected="@(p.Status == "DQ")">DQ (Disqualified)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="text-end flex-grow-1" style="min-width: 120px;">
+                                            <button type="submit" class="btn btn-sm btn-success w-100">
+                                                <i class="bi bi-check-lg me-1"></i> Publish
+                                            </button>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-people fs-1 d-block mb-2"></i>
+                <h5>No participants have enrolled for this event yet</h5>
+                <p class="small">Results can be entered once participants enrol.</p>
+            </div>
+        }
+    </div>
+</div>

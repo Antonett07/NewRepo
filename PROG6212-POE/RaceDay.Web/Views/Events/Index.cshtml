@@ -1,0 +1,130 @@
+﻿@model RaceDay.Web.ViewModels.EventFilterViewModel
+@{
+    ViewData["Title"] = "Upcoming Races & Events";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-calendar-event text-warning me-2"></i>Upcoming Races &amp; Events
+        </h2>
+        <p class="text-muted mb-0">Browse and filter official running, cycling, and walking events</p>
+    </div>
+</div>
+
+@* Filter Bar *@
+<div class="card rd-card mb-4 p-3 shadow-sm">
+    <form asp-controller="Events" asp-action="Index" method="get" class="row g-2 align-items-center">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                <input type="text" name="search" value="@Model.Search" class="form-control" placeholder="Search event name or keyword..." />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-geo-alt"></i></span>
+                <input type="text" name="location" value="@Model.Location" class="form-control" placeholder="Filter by city/location..." />
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-tag"></i></span>
+                <select name="eventType" class="form-select">
+                    <option value="">All Event Types</option>
+                    <option value="Road Running" selected="@(Model.EventType == "Road Running")">Road Running</option>
+                    <option value="Trail Running" selected="@(Model.EventType == "Trail Running")">Trail Running</option>
+                    <option value="Cycling" selected="@(Model.EventType == "Cycling")">Cycling</option>
+                    <option value="Walk" selected="@(Model.EventType == "Walk" || Model.EventType == "Fun Run / Walk")">Walk / Fun Run</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-raceday flex-grow-1">
+                <i class="bi bi-funnel-fill me-1"></i> Filter
+            </button>
+            @if (!string.IsNullOrEmpty(Model.Search) || !string.IsNullOrEmpty(Model.Location) || !string.IsNullOrEmpty(Model.EventType))
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary" title="Reset Filters">
+                    <i class="bi bi-x-circle"></i>
+                </a>
+            }
+        </div>
+    </form>
+</div>
+
+@* Events Cards Grid *@
+@if (Model.Events.Any())
+{
+    <div class="row g-4">
+        @foreach (var ev in Model.Events)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card rd-card h-100 d-flex flex-column">
+                    @if (!string.IsNullOrEmpty(ev.BannerImageUrl))
+                    {
+                        <img src="@ev.BannerImageUrl" class="rd-card-banner" alt="@ev.EventName" />
+                    }
+                    else
+                    {
+                        <div class="rd-card-banner bg-secondary d-flex align-items-center justify-content-center text-white">
+                            <i class="bi bi-image fs-1 text-white-50"></i>
+                        </div>
+                    }
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-dark">@ev.EventType</span>
+                            <span class="badge @(ev.IsUpcoming ? "bg-success" : "bg-secondary")">
+                                @(ev.IsUpcoming ? "Upcoming" : "Concluded")
+                            </span>
+                        </div>
+
+                        <h5 class="card-title fw-bold mb-2">@ev.EventName</h5>
+
+                        <div class="text-muted small mb-2">
+                            <i class="bi bi-calendar3 text-warning me-1"></i> @ev.FormattedDate
+                        </div>
+                        <div class="text-muted small mb-2">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i> @ev.Location
+                        </div>
+                        @if (!string.IsNullOrEmpty(ev.Distance))
+                        {
+                            <div class="text-muted small mb-3">
+                                <i class="bi bi-speedometer2 text-primary me-1"></i> Distances: <strong>@ev.Distance</strong>
+                            </div>
+                        }
+
+                        <p class="card-text text-muted small flex-grow-1">
+                            @if (!string.IsNullOrEmpty(ev.Description) && ev.Description.Length > 110)
+                            {
+                                @(ev.Description.Substring(0, 110) + "...")
+                            }
+                            else
+                            {
+                                @ev.Description
+                            }
+                        </p>
+
+                        <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">
+                                <i class="bi bi-people-fill me-1"></i> <strong>@ev.TotalEnrolments</strong> entries
+                            </span>
+                            <a asp-action="Details" asp-route-id="@ev.EventId" class="btn btn-raceday btn-sm">
+                                View Details &amp; Enrol <i class="bi bi-chevron-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <div class="display-3 text-muted mb-3"><i class="bi bi-search"></i></div>
+        <h4 class="fw-bold">No events matched your criteria</h4>
+        <p class="text-muted">Try adjusting your filters or search terms.</p>
+        <a asp-action="Index" class="btn btn-outline-raceday">Reset All Filters</a>
+    </div>
+}

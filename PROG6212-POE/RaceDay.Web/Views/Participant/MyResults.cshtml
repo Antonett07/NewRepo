@@ -1,0 +1,108 @@
+﻿@model List<RaceDay.Web.ViewModels.ResultViewModel>
+@{
+    ViewData["Title"] = "My Race Results & History";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-trophy-fill text-warning me-2"></i>My Personal Race Results
+        </h2>
+        <p class="text-muted mb-0">Official personal race history, finishing times, and certified ranking positions</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="MyEnrolments" class="btn btn-outline-secondary">
+            <i class="bi bi-ticket-perforated me-1"></i> My Enrolments
+        </a>
+        <a asp-controller="Events" asp-action="Index" class="btn btn-raceday">
+            <i class="bi bi-plus-circle-fill me-1"></i> Browse Upcoming Races
+        </a>
+    </div>
+</div>
+
+@if (Model.Any())
+{
+    <div class="row g-4">
+        @foreach (var res in Model)
+        {
+            <div class="col-lg-6">
+                <div class="card rd-card h-100 shadow-sm border-start border-warning border-4 p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-dark mb-1">@res.CategoryName (@res.DistanceKM km)</span>
+                            <h4 class="fw-bold text-dark mb-1">@res.EventName</h4>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar3 text-warning me-1"></i> @res.EventDate.ToString("dd MMMM yyyy") &nbsp;|&nbsp;
+                                <i class="bi bi-geo-alt text-danger me-1"></i> @res.Location
+                            </small>
+                        </div>
+                        <span class="badge bg-success px-3 py-2 fs-6">
+                            <i class="bi bi-check-circle-fill me-1"></i> @res.Status
+                        </span>
+                    </div>
+
+                    <div class="row g-3 my-2">
+                        @* Recorded Finish Time *@
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded-3 text-center border">
+                                <small class="text-muted text-uppercase fw-bold d-block mb-1">
+                                    <i class="bi bi-stopwatch text-warning me-1"></i> Recorded Finish Time
+                                </small>
+                                <span class="display-6 fw-bold text-dark font-monospace">
+                                    @(string.IsNullOrEmpty(res.FinishTime) ? "--:--:--" : res.FinishTime)
+                                </span>
+                            </div>
+                        </div>
+
+                        @* Certified Finishing Position (e.g. 47th out of 312 finishers) *@
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-warning bg-opacity-10 rounded-3 text-center border border-warning border-opacity-25 h-100 d-flex flex-column justify-content-center">
+                                <small class="text-warning-emphasis text-uppercase fw-bold d-block mb-1">
+                                    <i class="bi bi-award-fill text-warning me-1"></i> Finishing Position
+                                </small>
+                                <div class="fs-5 fw-bold text-dark">
+                                    @res.PositionFormatted
+                                </div>
+                                @if (res.CategoryPosition.HasValue)
+                                {
+                                    <small class="text-muted mt-1">@res.CategoryPositionFormatted</small>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-top mt-3 d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            @if (res.RaceNumber.HasValue)
+                            {
+                                <span>Bib Number: <strong>#@res.RaceNumber.Value</strong></span>
+                            }
+                        </small>
+                        <a asp-controller="Events" asp-action="Details" asp-route-id="@res.EventId" class="btn btn-outline-secondary btn-sm">
+                            View Event Details <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="card rd-card p-5 text-center my-4 shadow-sm">
+        <div class="display-3 text-muted mb-3"><i class="bi bi-trophy"></i></div>
+        <h4 class="fw-bold mb-2">No Race Results Recorded Yet</h4>
+        <p class="text-muted mb-4">
+            Once you complete an enrolled race and the Organiser captures the official race times,
+            your certified finish time and position (e.g. 47th out of 312 finishers) will be published right here!
+        </p>
+        <div>
+            <a asp-action="MyEnrolments" class="btn btn-outline-raceday me-2">
+                <i class="bi bi-ticket-perforated me-1"></i> Check My Enrolments
+            </a>
+            <a asp-controller="Events" asp-action="Index" class="btn btn-raceday">
+                <i class="bi bi-search me-1"></i> Browse Upcoming Races
+            </a>
+        </div>
+    </div>
+}
